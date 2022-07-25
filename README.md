@@ -1,11 +1,7 @@
-## My Project
+## SageMaker Hosting
 
-TODO: Fill this README out!
+Compilation of examples of SageMaker Hosting(Inference) options and other features.
 
-Be sure to:
-
-* Change the title in this README
-* Edit your repository description on GitHub
 
 ## Security
 
