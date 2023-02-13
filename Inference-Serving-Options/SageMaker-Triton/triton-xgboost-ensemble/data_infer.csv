@@ -1,0 +1,6 @@
+User,Card,Year,Month,Day,Time,Amount,Use Chip,Merchant Name,Merchant City,Merchant State,Zip,MCC,Errors?
+275,0,2000,7,25,13:57,$7.18,Swipe Transaction,2027553650310142703,Colorado Springs,CO,80918.0,5541,
+940,0,2016,10,27,21:16,$37.47,Swipe Transaction,7069584154815291371,Reading,MA,1867.0,5812,
+1846,0,2013,9,2,13:32,$10.62,Swipe Transaction,5474320255037684877,Saint Louis,MO,63146.0,5912,
+1398,0,2014,9,20,07:35,$24.52,Swipe Transaction,-6738340320657348028,Georgetown,IL,61846.0,7538,
+1192,2,2013,12,10,14:46,$95.30,Swipe Transaction,-1662162349688630531,Newport News,VA,23605.0,5541,
