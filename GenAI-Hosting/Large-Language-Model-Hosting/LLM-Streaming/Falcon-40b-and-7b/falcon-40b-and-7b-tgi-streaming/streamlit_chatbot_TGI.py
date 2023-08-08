@@ -7,7 +7,7 @@ import streamlit as st
 from streamlit_chat import message
 
 
-class Parser:
+class LineIterator:
     """
     A helper class for parsing the byte stream input from TGI container. 
     
@@ -35,27 +35,32 @@ class Parser:
     lines that doe not end with a '\n' to make sure truncations are concatinated
     """
     
-    def __init__(self):
-        self.buff = io.BytesIO()
+    def __init__(self, stream):
+        self.byte_iterator = iter(stream)
+        self.buffer = io.BytesIO()
         self.read_pos = 0
-        
-    def write(self, content):
-        self.buff.seek(0, io.SEEK_END)
-        self.buff.write(content)
-        
-    def scan_lines(self, pending=b''):
-        self.buff.seek(self.read_pos)
-        lines = self.buff.read().splitlines(True)
-        for line in lines[:-1]:
-            self.read_pos += len(line)
-            yield line.splitlines(False)[0]
-        line = lines[-1]
-        if line[-1:]==b"\n":
-            self.read_pos += len(line)
-            yield line.splitlines(False)[0]
-                
-    def reset(self):
-        self.read_pos = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        while True:
+            self.buffer.seek(self.read_pos)
+            line = self.buffer.readline()
+            if line and line[-1] == ord('\n'):
+                self.read_pos += len(line)
+                return line[:-1]
+            try:
+                chunk = next(self.byte_iterator)
+            except StopIteration:
+                if self.read_pos < self.buffer.getbuffer().nbytes:
+                    continue
+                raise
+            if 'PayloadPart' not in chunk:
+                print("Unknown event type:" + chunk)
+                continue
+            self.buffer.seek(0, io.SEEK_END)
+            self.buffer.write(chunk['PayloadPart']['Bytes'])
         
 boto3_session=boto3.session.Session(region_name="us-west-2")
 smr = boto3.client('sagemaker-runtime-demo')
@@ -123,15 +128,12 @@ with container:
         resp = smr.invoke_endpoint_with_response_stream(EndpointName=endpoint_name, Body=json.dumps(body), ContentType="application/json")
         print(resp)
         event_stream = resp['Body']
-        parser = Parser()
         output = ''
-        for event in event_stream:
-            parser.write(event['PayloadPart']['Bytes'])
-            for line in parser.scan_lines():
-                out = line.decode("utf-8")
-                if out !="":
-                    data= json.loads(out[5:])["token"]["text"]
-                    if data != '<|endoftext|>':
+        for line in LineIterator(event_stream):
+            out = json.loads(line.decode('utf-8'))
+            if out !="":
+                    data = json.loads(out[5:])["token"]["text"]
+                    if data != stop_token:
                         output += data
                         element.markdown(output)
 
