@@ -65,6 +65,7 @@ class LineIterator:
 boto3_session=boto3.session.Session(region_name="us-west-2")
 smr = boto3.client('sagemaker-runtime-demo')
 endpoint_name = os.getenv("endpoint_name", default=None)
+stop_token = '<|endoftext|>'
         
 # initialise session variables
 if 'generated' not in st.session_state:
@@ -130,12 +131,11 @@ with container:
         event_stream = resp['Body']
         output = ''
         for line in LineIterator(event_stream):
-            out = json.loads(line.decode('utf-8'))
-            if out !="":
-                    data = json.loads(out[5:])["token"]["text"]
-                    if data != stop_token:
-                        output += data
-                        element.markdown(output)
+            if line != b'':
+                data = json.loads(line[5:].decode('utf-8'))['token']['text']
+                if data != stop_token:
+                    output += data
+                    element.markdown(output)
 
         st.session_state['generated'].append(output)
     
