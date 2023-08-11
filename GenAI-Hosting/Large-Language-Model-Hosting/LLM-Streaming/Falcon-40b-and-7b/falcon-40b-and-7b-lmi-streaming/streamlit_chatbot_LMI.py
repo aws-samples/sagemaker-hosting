@@ -9,6 +9,34 @@ from streamlit_chat import message
 aws_region = boto3.Session().region_name
 smr = boto3.client('sagemaker-runtime-demo')
 endpoint_name = os.getenv("endpoint_name", default=None)
+
+class LineIterator:
+    def __init__(self, stream):
+        self.byte_iterator = iter(stream)
+        self.buffer = io.BytesIO()
+        self.read_pos = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        while True:
+            self.buffer.seek(self.read_pos)
+            line = self.buffer.readline()
+            if line and line[-1] == ord('\n'):
+                self.read_pos += len(line)
+                return line[:-1]
+            try:
+                chunk = next(self.byte_iterator)
+            except StopIteration:
+                if self.read_pos < self.buffer.getbuffer().nbytes:
+                    continue
+                raise
+            if 'PayloadPart' not in chunk:
+                print('Unknown event type:' + chunk)
+                continue
+            self.buffer.seek(0, io.SEEK_END)
+            self.buffer.write(chunk['PayloadPart']['Bytes'])
         
 # initialise session variables
 if 'generated' not in st.session_state:
@@ -74,15 +102,10 @@ with container:
         event_stream = resp['Body']
 
         output = ''
-        for event in event_stream:
-            
-            chunk = event.get('PayloadPart')
-            if chunk:
-                chunk_obj = chunk.get("Bytes").decode('utf-8')
-                text = chunk_obj
-                data = json.loads(text)
-                output += data['outputs'][0]+''
-                element.markdown(output)
+        for line in LineIterator(event_stream):
+            data = json.loads(line)
+            output += data['outputs'][0]+''
+            element.markdown(output)
         st.session_state['generated'].append(output)
     
             
