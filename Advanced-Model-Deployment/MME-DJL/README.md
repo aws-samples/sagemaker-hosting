@@ -1,1 +1,1 @@
-## To-Do: Add Code Samples For DJL Serving
+## To-Do: Add Blog URL
