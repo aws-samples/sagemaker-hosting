@@ -27,7 +27,7 @@ class BotoClient:
         self.endpoint_name = host.split('/')[-1]
         self.region = region
         self.content_type = content_type
-        self.payload = '[[0,0,0,0,0,0]]'
+        self.payload = '[[0.5]]'
 
     def send(self):
 
