@@ -2,7 +2,6 @@ import io,os
 import boto3
 import sagemaker
 import json
-from langchain.schema import ChatMessage
 import streamlit as st
 from streamlit_chat import message
 
