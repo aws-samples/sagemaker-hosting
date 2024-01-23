@@ -13,18 +13,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# --
-# --  Author:        Pavan Kumar Rao Navule
-# --  Date:          1/12/2023
-# --  Purpose:       Iterates over the byte stream from Llama 2 Chat models inferenced with LMI Container with djl-deepspeed version 0.25.0.
-# --  Version:       0.1.0
-# --  Disclaimer:    This script is provided "as is" in accordance with the repository license
-# --  History
-# --  When        Version     Who         What
-# --  -----------------------------------------------------------------
-# --  1/12/2023  0.1.0       Pavan Kumar Rao Navule    Initial
-# --  -----------------------------------------------------------------
-# --
+
 
 import io
 import re
