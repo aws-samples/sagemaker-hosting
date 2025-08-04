@@ -2,6 +2,7 @@
 
 Compilation of examples of SageMaker Hosting(Inference) options and other features.
 
+## [GenAI Hosting Samples Repository](https://github.com/aws-samples/sagemaker-genai-hosting-examples/tree/main)
 
 ## Security
 
